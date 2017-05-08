@@ -1,14 +1,44 @@
-app.controller("TaskListItemController", ["$scope", "$routeParams", "$location", "TaskService", function($scope, $routeParams, $location, TaskService){
-console.log(" 111 Item Id  " +  $routeParams.id)
+(function () {
+"use strict";
+
+angular.module('TaskListApp')
+.controller('TaskListItemController', TaskListItemController);
+
+TaskListItemController.$inject = ["$scope", "$routeParams", "$location", "TaskService"];
+function TaskListItemController($scope, $routeParams, $location, TaskService){
+
+    var $ctrl = this;
+
     if(!$routeParams.id) {
         $scope.taskItem = {id: 0, completed: false, itemName: "", date: new Date()};
     }else{
-      console.log("i am here " + TaskService.findById($routeParams.id));
-        $scope.taskItem = _.clone();
+      TaskService.findById($routeParams.id)
+        .then(function(response) {
+          $scope.taskItem = response;
+        })
+        .catch(function(response) {
+          //console.log(response);
+        });
     }
 
     $scope.save = function(){
-        TaskService.save( $scope.taskItem );
+
+        var updatedItem = TaskService.findById($scope.taskItem._id);
+        var task = TaskService.save( $scope.taskItem );
+
+        task.then(function(response){
+          if(updatedItem){
+            updatedItem.completed = response.completed;
+            updatedItem.itemName = response.itemName;
+            updatedItem.date = response.date;
+          } else {
+            $scope.taskItem._id = response._id;
+            $scope.taskItems = new Array();
+            $scope.taskItems.push($scope.taskItem);
+          }
+          //console.log(response);
+        });
         $location.path("/");
     };
-}]);
+}
+})();

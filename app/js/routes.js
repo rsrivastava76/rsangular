@@ -1,13 +1,12 @@
 (function () {
 'use strict';
-
 angular.module('TaskListApp')
-
-app.config(function($routeProvider){
+.config(function($routeProvider){
     $routeProvider
         .when("/",{
             templateUrl: "views/taskList.html",
-            controller: "HomeController"
+            controller: "HomeController",
+            controllerAs: 'homeCtrl'
         })
         .when("/addItem",{
             templateUrl: "views/addItem.html",
